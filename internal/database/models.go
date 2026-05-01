@@ -10,6 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type Item struct {
+	ID                uuid.UUID
+	Sku               string
+	Name              string
+	Description       string
+	LowStockThreshold int32
+	CreatedAt         time.Time
+}
+
 type User struct {
 	ID             uuid.UUID
 	Username       string
