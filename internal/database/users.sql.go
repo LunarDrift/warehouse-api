@@ -35,6 +35,42 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getUserFromID = `-- name: GetUserFromID :one
+SELECT id, username, hashed_password, role, created_at FROM users
+WHERE id = $1
+`
+
+func (q *Queries) GetUserFromID(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserFromID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.HashedPassword,
+		&i.Role,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserFromName = `-- name: GetUserFromName :one
+SELECT id, username, hashed_password, role, created_at FROM users
+WHERE username = $1
+`
+
+func (q *Queries) GetUserFromName(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserFromName, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.HashedPassword,
+		&i.Role,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const updateUserRole = `-- name: UpdateUserRole :one
 UPDATE users
 SET role = $2
