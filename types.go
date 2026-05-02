@@ -44,12 +44,6 @@ type receiveStockParams struct {
 	Quantity   int32     `json:"quantity"`
 }
 
-type moveStockParams struct {
-	Quantity   int32     `json:"quantity"`
-	ItemID     uuid.UUID `json:"item_id"`
-	LocationID uuid.UUID `json:"location_id"`
-}
-
 type moveStockRequest struct {
 	ItemID         uuid.UUID `json:"item_id"`
 	FromLocationID uuid.UUID `json:"from_location"`
