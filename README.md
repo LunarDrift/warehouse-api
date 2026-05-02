@@ -7,14 +7,14 @@ A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, s
 - Create and manage locations (bays, shelves, etc)
 - Move stock between locations
 - View current stock levels per item and per location
-- [Role-based access: `worker` and `manager` roles with different permissions
+- Role-based access: `worker` and `manager` roles with different permissions
 
 ## Tech Stack
 - **Go:** HTTP server (`net/http`)
 - **PostgreSQL:** persistent storage
 - **goose:** database migrations
 - **sqlc:** type-safe SQL query generation
-- **Docker:** containerize the app and database together
+- **Docker:** containerize the app and database together (not yet implemented)
 
 ## API Endpoints
 
