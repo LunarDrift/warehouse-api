@@ -100,3 +100,35 @@ func (s *Server) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, http.StatusOK, loginResp)
 }
+
+func (s *Server) handleCreateItem(w http.ResponseWriter, r *http.Request) {
+	// TODO: Implement low-stock threshold
+	var params struct {
+		Sku         string `json:"sku"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+	}
+	item, err := s.dbQueries.CreateItem(r.Context(), database.CreateItemParams{
+		Sku:         params.Sku,
+		Name:        params.Name,
+		Description: params.Description,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not create item", err)
+		return
+	}
+	respondWithJSON(w, http.StatusCreated, item)
+}
+
+func (s *Server) handleGetItems(w http.ResponseWriter, r *http.Request) {
+	items, err := s.dbQueries.GetAllItems(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch items", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, items)
+}

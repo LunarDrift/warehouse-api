@@ -29,8 +29,12 @@ func NewServer(db *sql.DB, dbQueries *database.Queries, jwtSecret string) *Serve
 
 func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("GET /health", s.handleHealth)
+
 	s.mux.HandleFunc("POST /register", s.handleCreateUser)
 	s.mux.HandleFunc("POST /login", s.handleLoginUser)
+
+	s.mux.HandleFunc("GET /items", s.handleGetItems)
+	s.mux.HandleFunc("POST /items", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateItem)))
 }
 
 func respondWithJSON(w http.ResponseWriter, status int, payload any) {
