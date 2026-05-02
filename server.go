@@ -35,6 +35,7 @@ func (s *Server) registerRoutes() {
 
 	s.mux.HandleFunc("GET /items", s.handleGetItems)
 	s.mux.HandleFunc("POST /items", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateItem)))
+	s.mux.HandleFunc("GET /items/{id}", s.handleGetItemFromID)
 }
 
 func respondWithJSON(w http.ResponseWriter, status int, payload any) {
