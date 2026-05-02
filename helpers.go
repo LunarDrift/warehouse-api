@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/LunarDrift/warehouse-api/internal/database"
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func (s *Server) processMoveStock(ctx context.Context, params moveStockRequest, 
 		LocationID: params.FromLocationID,
 	})
 	if err != nil {
-		return database.StockMovement{}, err
+		return database.StockMovement{}, fmt.Errorf("error decrementing source: %w", err)
 	}
 
 	// increment destination; create row if it doesn't already exist with ReceiveStock
@@ -42,7 +43,7 @@ func (s *Server) processMoveStock(ctx context.Context, params moveStockRequest, 
 		Quantity:   params.Quantity,
 	})
 	if err != nil {
-		return database.StockMovement{}, err
+		return database.StockMovement{}, fmt.Errorf("error incrementing destination: %w", err)
 	}
 
 	// log the movement
@@ -54,7 +55,7 @@ func (s *Server) processMoveStock(ctx context.Context, params moveStockRequest, 
 		MovedBy:        movedBy,
 	})
 	if err != nil {
-		return database.StockMovement{}, err
+		return database.StockMovement{}, fmt.Errorf("error logging movement: %w", err)
 	}
 
 	return movement, tx.Commit()
