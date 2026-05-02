@@ -352,3 +352,28 @@ func (s *Server) handleMoveStock(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, http.StatusOK, movement)
 }
+
+func (s *Server) handleGetMovementHistory(w http.ResponseWriter, r *http.Request) {
+	movements, err := s.dbQueries.GetAllMovements(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch movement history", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, movements)
+}
+
+func (s *Server) handleGetItemMovementHistory(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	itemID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid location ID", err)
+		return
+	}
+
+	movementHistory, err := s.dbQueries.GetMovementsForItem(r.Context(), itemID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch movement history", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, movementHistory)
+}

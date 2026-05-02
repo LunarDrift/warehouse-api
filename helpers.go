@@ -45,6 +45,7 @@ func (s *Server) processMoveStock(ctx context.Context, params moveStockRequest, 
 		return database.StockMovement{}, err
 	}
 
+	// log the movement
 	movement, err := qtx.CreateMovement(ctx, database.CreateMovementParams{
 		ItemID:         params.ItemID,
 		FromLocationID: uuid.NullUUID{UUID: params.FromLocationID, Valid: true},
