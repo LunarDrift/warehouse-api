@@ -34,6 +34,16 @@ type Stock struct {
 	Quantity   int32
 }
 
+type StockMovement struct {
+	ID             uuid.UUID
+	ItemID         uuid.UUID
+	FromLocationID uuid.NullUUID
+	ToLocationID   uuid.NullUUID
+	Quantity       int32
+	MovedBy        uuid.UUID
+	MovedAt        time.Time
+}
+
 type User struct {
 	ID             uuid.UUID
 	Username       string
