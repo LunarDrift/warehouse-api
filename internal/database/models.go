@@ -27,6 +27,13 @@ type Location struct {
 	CreatedAt   time.Time
 }
 
+type Stock struct {
+	ID         uuid.UUID
+	ItemID     uuid.UUID
+	LocationID uuid.UUID
+	Quantity   int32
+}
+
 type User struct {
 	ID             uuid.UUID
 	Username       string

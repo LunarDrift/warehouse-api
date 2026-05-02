@@ -296,3 +296,34 @@ func (s *Server) handleDeleteLocation(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// #########################################################################################################################
+// STOCK HANDLERS
+// #########################################################################################################################
+func (s *Server) handleReceiveStock(w http.ResponseWriter, r *http.Request) {
+	var params receiveStockParams
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+	stockInfo, err := s.dbQueries.ReceiveStock(r.Context(), database.ReceiveStockParams{
+		ItemID:     params.ItemID,
+		LocationID: params.LocationID,
+		Quantity:   params.Quantity,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not receive item", err)
+		return
+	}
+	respondWithJSON(w, http.StatusCreated, stockInfo)
+}
+
+func (s *Server) handleGetAllStock(w http.ResponseWriter, r *http.Request) {
+	items, err := s.dbQueries.GetAllStock(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch stock info", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, items)
+}

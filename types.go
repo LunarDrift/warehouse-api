@@ -37,3 +37,15 @@ type itemParams struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
+
+type receiveStockParams struct {
+	ItemID     uuid.UUID `json:"item_id"`
+	LocationID uuid.UUID `json:"location_id"`
+	Quantity   int32     `json:"quantity"`
+}
+
+type moveStockParams struct {
+	Quantity   int32     `json:"quantity"`
+	ItemID     uuid.UUID `json:"item_id"`
+	LocationID uuid.UUID `json:"location_id"`
+}
