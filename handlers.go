@@ -328,6 +328,36 @@ func (s *Server) handleGetAllStock(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, items)
 }
 
+func (s *Server) handleGetItemStock(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	itemID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid location ID", err)
+		return
+	}
+	stock, err := s.dbQueries.GetStockForItemAllLocations(r.Context(), itemID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch stock info for that item", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, stock)
+}
+
+func (s *Server) handleGetLocationStock(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	locID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid location ID", err)
+		return
+	}
+	stock, err := s.dbQueries.GetStockForItemSpecificLocation(r.Context(), locID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch stock info for that location", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, stock)
+}
+
 // #########################################################################################################################
 // STOCK MOVEMENT HANDLERS
 // #########################################################################################################################

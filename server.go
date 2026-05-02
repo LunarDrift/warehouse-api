@@ -46,6 +46,8 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("DELETE /locations/{id}", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleDeleteLocation)))
 
 	s.mux.HandleFunc("GET /stock", s.handleGetAllStock)
+	s.mux.HandleFunc("GET /stock/item/{id}", s.handleGetItemStock)
+	s.mux.HandleFunc("GET /stock/location/{id}", s.handleGetLocationStock)
 	s.mux.HandleFunc("POST /stock/receive", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleReceiveStock)))
 	s.mux.HandleFunc("POST /stock/move", s.middlewareAuth(s.handleMoveStock))
 
