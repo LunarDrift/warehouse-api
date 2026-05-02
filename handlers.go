@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,11 +18,11 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintln(w, `{"status": "ok"}`)
 }
 
+// #########################################################################################################################
+// USER HANDLERS
+// #########################################################################################################################
 func (s *Server) handleCreateUser(w http.ResponseWriter, r *http.Request) {
-	var params struct {
-		UserName string `json:"username"`
-		Password string `json:"password"`
-	}
+	var params userParams
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
@@ -59,10 +60,7 @@ func (s *Server) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleLoginUser(w http.ResponseWriter, r *http.Request) {
-	var params struct {
-		UserName string `json:"username"`
-		Password string `json:"password"`
-	}
+	var params userParams
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
@@ -101,13 +99,13 @@ func (s *Server) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, loginResp)
 }
 
+// #########################################################################################################################
+// ITEM HANDLERS
+// #########################################################################################################################
+// TODO: Implement low-stock threshold
+
 func (s *Server) handleCreateItem(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement low-stock threshold
-	var params struct {
-		Sku         string `json:"sku"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-	}
+	var params itemParams
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
@@ -171,11 +169,7 @@ func (s *Server) handleUpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var params struct {
-		Sku         string `json:"sku"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-	}
+	var params itemParams
 	err = json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
@@ -193,4 +187,118 @@ func (s *Server) handleUpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJSON(w, http.StatusOK, item)
+}
+
+// #########################################################################################################################
+// LOCATION HANDLERS
+// #########################################################################################################################
+func (s *Server) handleCreateLocation(w http.ResponseWriter, r *http.Request) {
+	var params locationParams
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	description := sql.NullString{}
+	if params.Description != nil {
+		description = sql.NullString{String: *params.Description, Valid: true}
+	}
+
+	loc, err := s.dbQueries.CreateLocation(r.Context(), database.CreateLocationParams{
+		Name:        params.Name,
+		Description: description,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not create location", err)
+		return
+	}
+	respondWithJSON(w, http.StatusCreated, loc)
+}
+
+func (s *Server) handleGetLocations(w http.ResponseWriter, r *http.Request) {
+	locs, err := s.dbQueries.GetAllLocations(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch locations", err)
+		return
+	}
+
+	result := make([]Location, len(locs))
+	for i, loc := range locs {
+		result[i] = Location{
+			ID:          loc.ID,
+			Name:        loc.Name,
+			Description: loc.Description.String,
+			CreatedAt:   loc.CreatedAt,
+		}
+	}
+	respondWithJSON(w, http.StatusOK, result)
+}
+
+func (s *Server) handleGetLocationFromID(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	locID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid location ID", err)
+		return
+	}
+
+	loc, err := s.dbQueries.GetLocationFromID(r.Context(), locID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch location", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, Location{
+		ID:          loc.ID,
+		Name:        loc.Name,
+		Description: loc.Description.String,
+		CreatedAt:   loc.CreatedAt,
+	})
+}
+
+func (s *Server) handleUpdateLocation(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	locID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid location ID", err)
+		return
+	}
+
+	var params locationParams
+	err = json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	description := sql.NullString{}
+	if params.Description != nil {
+		description = sql.NullString{String: *params.Description, Valid: true}
+	}
+
+	loc, err := s.dbQueries.UpdateLocation(r.Context(), database.UpdateLocationParams{
+		ID:          locID,
+		Name:        params.Name,
+		Description: description,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not update location", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, loc)
+}
+
+func (s *Server) handleDeleteLocation(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	locID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid location ID", err)
+		return
+	}
+	err = s.dbQueries.DeleteLocation(r.Context(), locID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not delete location", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }

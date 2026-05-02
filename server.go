@@ -38,6 +38,12 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("GET /items/{id}", s.handleGetItemFromID)
 	s.mux.HandleFunc("DELETE /items/{id}", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleDeleteItem)))
 	s.mux.HandleFunc("PATCH /items/{id}", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleUpdateItem)))
+
+	s.mux.HandleFunc("POST /locations", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateLocation)))
+	s.mux.HandleFunc("GET /locations", s.handleGetLocations)
+	s.mux.HandleFunc("GET /locations/{id}", s.handleGetLocationFromID)
+	s.mux.HandleFunc("PATCH /locations/{id}", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleUpdateLocation)))
+	s.mux.HandleFunc("DELETE /locations/{id}", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleDeleteLocation)))
 }
 
 func respondWithJSON(w http.ResponseWriter, status int, payload any) {

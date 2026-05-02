@@ -5,6 +5,7 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,6 +18,13 @@ type Item struct {
 	Description       string
 	LowStockThreshold int32
 	CreatedAt         time.Time
+}
+
+type Location struct {
+	ID          uuid.UUID
+	Name        string
+	Description sql.NullString
+	CreatedAt   time.Time
 }
 
 type User struct {
