@@ -213,7 +213,8 @@ func (s *Server) handleCreateLocation(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "Could not create location", err)
 		return
 	}
-	respondWithJSON(w, http.StatusCreated, loc)
+	location := dbLocationToLocation(loc)
+	respondWithJSON(w, http.StatusCreated, location)
 }
 
 func (s *Server) handleGetLocations(w http.ResponseWriter, r *http.Request) {
@@ -223,14 +224,10 @@ func (s *Server) handleGetLocations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// map results to main.Location to remove Description.Valid field from payload
 	result := make([]Location, len(locs))
 	for i, loc := range locs {
-		result[i] = Location{
-			ID:          loc.ID,
-			Name:        loc.Name,
-			Description: loc.Description.String,
-			CreatedAt:   loc.CreatedAt,
-		}
+		result[i] = dbLocationToLocation(loc)
 	}
 	respondWithJSON(w, http.StatusOK, result)
 }
@@ -248,12 +245,8 @@ func (s *Server) handleGetLocationFromID(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, http.StatusInternalServerError, "Could not fetch location", err)
 		return
 	}
-	respondWithJSON(w, http.StatusOK, Location{
-		ID:          loc.ID,
-		Name:        loc.Name,
-		Description: loc.Description.String,
-		CreatedAt:   loc.CreatedAt,
-	})
+	location := dbLocationToLocation(loc)
+	respondWithJSON(w, http.StatusOK, location)
 }
 
 func (s *Server) handleUpdateLocation(w http.ResponseWriter, r *http.Request) {
@@ -285,7 +278,8 @@ func (s *Server) handleUpdateLocation(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "Could not update location", err)
 		return
 	}
-	respondWithJSON(w, http.StatusOK, loc)
+	location := dbLocationToLocation(loc)
+	respondWithJSON(w, http.StatusOK, location)
 }
 
 func (s *Server) handleDeleteLocation(w http.ResponseWriter, r *http.Request) {
