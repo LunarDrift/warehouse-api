@@ -327,3 +327,28 @@ func (s *Server) handleGetAllStock(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, http.StatusOK, items)
 }
+
+// #########################################################################################################################
+// STOCK MOVEMENT HANDLERS
+// #########################################################################################################################
+func (s *Server) handleMoveStock(w http.ResponseWriter, r *http.Request) {
+	var params moveStockRequest
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	user, ok := r.Context().Value(userKey).(database.User)
+	if !ok {
+		respondWithError(w, http.StatusInternalServerError, "Could not get user from context", nil)
+		return
+	}
+
+	movement, err := s.processMoveStock(r.Context(), params, user.ID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not move stock", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, movement)
+}

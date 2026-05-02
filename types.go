@@ -49,3 +49,10 @@ type moveStockParams struct {
 	ItemID     uuid.UUID `json:"item_id"`
 	LocationID uuid.UUID `json:"location_id"`
 }
+
+type moveStockRequest struct {
+	ItemID         uuid.UUID `json:"item_id"`
+	FromLocationID uuid.UUID `json:"from_location"`
+	ToLocationID   uuid.UUID `json:"to_location"`
+	Quantity       int32     `json:"quantity"`
+}

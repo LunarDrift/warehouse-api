@@ -47,6 +47,7 @@ func (s *Server) registerRoutes() {
 
 	s.mux.HandleFunc("POST /stock/receive", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleReceiveStock)))
 	s.mux.HandleFunc("GET /stock", s.handleGetAllStock)
+	s.mux.HandleFunc("POST /stock/move", s.middlewareAuth(s.handleMoveStock))
 }
 
 func respondWithJSON(w http.ResponseWriter, status int, payload any) {
