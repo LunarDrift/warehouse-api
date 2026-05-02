@@ -2,20 +2,12 @@
 A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, stock levels across multiple storage locations, and stock movement history. Built for internal use by warehouse staff and managers, using role-based access to control what each user can do.
 
 ## Core Features
-- [x] User registration and login with JWT auth
-- [x] Create and manage items (SKU, name, description, quantity)
-- [x] Create and manage locations (bays, shelves, etc)
-- [x] Move stock between locations
-- [ ] View current stock levels per item and per location
-- [x] Role-based access: `worker` and `manager` roles with different permissions
-
-## Stretch Goals
-- [ ] Low stock alerts - flag items that fall below a configurable threshold
-- [ ] Audit log - append-only record of every stock movement (who did it, when, how much)
-- [ ] Soft deletes - instead of hard deleting items or locations, mark them inactive
-- [ ] Search and filtering on item listings (by name, SKU, low stock status)
-- [ ] Receiving endpoint - bulk-add stock from a shipment to a location
-- [ ] Admin role - can manage users, reset passwords, assign roles
+- User registration and login with JWT auth
+- Create and manage items (SKU, name, description, quantity)
+- Create and manage locations (bays, shelves, etc)
+- Move stock between locations
+- View current stock levels per item and per location
+- [Role-based access: `worker` and `manager` roles with different permissions
 
 ## Tech Stack
 - **Go:** HTTP server (`net/http`)
@@ -70,3 +62,10 @@ warehouse-api/
 └── sqlc.yaml
 ```
 
+## Stretch Goals
+- [ ] Low stock alerts - flag items that fall below a configurable threshold
+- [ ] Audit log - append-only record of every stock movement (who did it, when, how much)
+- [ ] Soft deletes - instead of hard deleting items or locations, mark them inactive
+- [ ] Search and filtering on item listings (by name, SKU, low stock status)
+- [ ] Receiving endpoint - bulk-add stock from a shipment to a location
+- [ ] Admin role - can manage users, reset passwords, assign roles
