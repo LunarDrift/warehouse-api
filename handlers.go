@@ -147,3 +147,50 @@ func (s *Server) handleGetItemFromID(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, http.StatusOK, item)
 }
+
+func (s *Server) handleDeleteItem(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	itemID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid item ID", err)
+		return
+	}
+	err = s.dbQueries.DeleteItem(r.Context(), itemID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not delete item", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (s *Server) handleUpdateItem(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	itemID, err := uuid.Parse(idStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid item ID", err)
+		return
+	}
+
+	var params struct {
+		Sku         string `json:"sku"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	item, err := s.dbQueries.UpdateItem(r.Context(), database.UpdateItemParams{
+		ID:          itemID,
+		Sku:         params.Sku,
+		Name:        params.Name,
+		Description: params.Description,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not update item", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, item)
+}
