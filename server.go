@@ -32,6 +32,8 @@ func (s *Server) registerRoutes() {
 
 	s.mux.HandleFunc("POST /register", s.handleCreateUser)
 	s.mux.HandleFunc("POST /login", s.handleLoginUser)
+	s.mux.HandleFunc("POST /refresh", s.handleRefreshAccessToken)
+	s.mux.HandleFunc("POST /revoke", s.handleRevokeAccessToken)
 	s.mux.HandleFunc("PATCH /user/{id}", s.middlewareAuth(s.handleChangePassword))
 
 	s.mux.HandleFunc("GET /items", s.handleGetItems)

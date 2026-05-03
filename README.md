@@ -23,6 +23,8 @@ A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, s
 | ------ | ---------------------- | ----------------------------------------------------- |
 | POST   | `/register`            | Create user account                                   |
 | POST   | `/login`               | Returns JWT                                           |
+| POST   | `/refresh`               | Returns new JWT                                           |
+| POST   | `/revoke`               | Revoke a refresh token                                           |
 |        |                        |                                                       |
 | GET    | `/items`               | List all items                                        |
 | POST   | `/items`               | Create item (manager only)                            |

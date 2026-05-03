@@ -85,22 +85,32 @@ func (s *Server) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Token database table
-	// refreshToken := auth.MakeRefreshToken()
+	refreshToken := auth.MakeRefreshToken()
+
+	_, err = s.dbQueries.CreateRefreshToken(r.Context(), database.CreateRefreshTokenParams{
+		Token:     refreshToken,
+		UserID:    dbUser.ID,
+		ExpiresAt: time.Now().UTC().Add(time.Hour * 24 * 60),
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not save refresh token", err)
+		return
+	}
 
 	type loginResponse struct {
-		ID        uuid.UUID `json:"id"`
-		UserName  string    `json:"username"`
-		Role      string    `json:"role"`
-		CreatedAt time.Time `json:"created_at"`
-		Token     string    `json:"token"`
+		User         User   `json:"user"`
+		Token        string `json:"token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 	loginResp := loginResponse{
-		ID:        dbUser.ID,
-		UserName:  dbUser.Username,
-		Role:      dbUser.Role,
-		CreatedAt: dbUser.CreatedAt,
-		Token:     accessToken,
+		User: User{
+			ID:        dbUser.ID,
+			UserName:  dbUser.Username,
+			Role:      dbUser.Role,
+			CreatedAt: dbUser.CreatedAt,
+		},
+		Token:        accessToken,
+		RefreshToken: refreshToken,
 	}
 	respondWithJSON(w, http.StatusOK, loginResp)
 }
@@ -152,6 +162,48 @@ func (s *Server) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	})
+}
+
+func (s *Server) handleRefreshAccessToken(w http.ResponseWriter, r *http.Request) {
+	type response struct {
+		Token string `json:"token"`
+	}
+
+	refreshToken, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body: could not find token", err)
+		return
+	}
+
+	user, err := s.dbQueries.GetUserFromRefreshToken(r.Context(), refreshToken)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", err)
+		return
+	}
+
+	accessToken, err := auth.MakeJWT(user.ID, s.jwtSecret, time.Hour)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized: could not validate token", err)
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, response{
+		Token: accessToken,
+	})
+}
+
+func (s *Server) handleRevokeAccessToken(w http.ResponseWriter, r *http.Request) {
+	refreshToken, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body: could not find token", err)
+		return
+	}
+	_, err = s.dbQueries.RevokeRefreshToken(r.Context(), refreshToken)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not revoke session", err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // #########################################################################################################################

@@ -27,6 +27,15 @@ type Location struct {
 	CreatedAt   time.Time
 }
 
+type RefreshToken struct {
+	Token     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uuid.UUID
+	ExpiresAt time.Time
+	RevokedAt sql.NullTime
+}
+
 type Stock struct {
 	ID         uuid.UUID
 	ItemID     uuid.UUID
