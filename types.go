@@ -48,8 +48,8 @@ type receiveStockParams struct {
 
 type moveStockRequest struct {
 	ItemID         uuid.UUID `json:"item_id"`
-	FromLocationID uuid.UUID `json:"from_location"`
-	ToLocationID   uuid.UUID `json:"to_location"`
+	FromLocationID uuid.UUID `json:"from_location_id"`
+	ToLocationID   uuid.UUID `json:"to_location_id"`
 	Quantity       int32     `json:"quantity"`
 }
 

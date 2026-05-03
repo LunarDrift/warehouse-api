@@ -14,7 +14,7 @@ import (
 const createItem = `-- name: CreateItem :one
 INSERT INTO items (sku, name, description, low_stock_threshold)
 VALUES ($1, $2, $3, $4)
-RETURNING id, sku, name, description, low_stock_threshold, created_at
+RETURNING id, sku, name, description, low_stock_threshold, created_at, is_active
 `
 
 type CreateItemParams struct {
@@ -39,12 +39,14 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		&i.Description,
 		&i.LowStockThreshold,
 		&i.CreatedAt,
+		&i.IsActive,
 	)
 	return i, err
 }
 
 const deleteItem = `-- name: DeleteItem :exec
-DELETE FROM items
+UPDATE items
+SET is_active = false
 WHERE id = $1
 `
 
@@ -54,7 +56,8 @@ func (q *Queries) DeleteItem(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllItems = `-- name: GetAllItems :many
-SELECT id, sku, name, description, low_stock_threshold, created_at FROM items
+SELECT id, sku, name, description, low_stock_threshold, created_at, is_active FROM items
+WHERE is_active = true
 ORDER BY created_at
 `
 
@@ -74,6 +77,7 @@ func (q *Queries) GetAllItems(ctx context.Context) ([]Item, error) {
 			&i.Description,
 			&i.LowStockThreshold,
 			&i.CreatedAt,
+			&i.IsActive,
 		); err != nil {
 			return nil, err
 		}
@@ -89,7 +93,7 @@ func (q *Queries) GetAllItems(ctx context.Context) ([]Item, error) {
 }
 
 const getItemFromID = `-- name: GetItemFromID :one
-SELECT id, sku, name, description, low_stock_threshold, created_at FROM items
+SELECT id, sku, name, description, low_stock_threshold, created_at, is_active FROM items
 WHERE id = $1
 `
 
@@ -103,6 +107,7 @@ func (q *Queries) GetItemFromID(ctx context.Context, id uuid.UUID) (Item, error)
 		&i.Description,
 		&i.LowStockThreshold,
 		&i.CreatedAt,
+		&i.IsActive,
 	)
 	return i, err
 }
@@ -111,7 +116,7 @@ const updateItem = `-- name: UpdateItem :one
 UPDATE items
 SET sku = $2, name = $3, description = $4
 WHERE id = $1
-RETURNING id, sku, name, description, low_stock_threshold, created_at
+RETURNING id, sku, name, description, low_stock_threshold, created_at, is_active
 `
 
 type UpdateItemParams struct {
@@ -136,6 +141,7 @@ func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, e
 		&i.Description,
 		&i.LowStockThreshold,
 		&i.CreatedAt,
+		&i.IsActive,
 	)
 	return i, err
 }

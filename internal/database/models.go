@@ -18,6 +18,7 @@ type Item struct {
 	Description       string
 	LowStockThreshold int32
 	CreatedAt         time.Time
+	IsActive          bool
 }
 
 type Location struct {

@@ -5,6 +5,7 @@ RETURNING *;
 
 -- name: GetAllItems :many
 SELECT * FROM items
+WHERE is_active = true
 ORDER BY created_at;
 
 -- name: GetItemFromID :one
@@ -18,5 +19,6 @@ WHERE id = $1
 RETURNING *;
 
 -- name: DeleteItem :exec
-DELETE FROM items
+UPDATE items
+SET is_active = false
 WHERE id = $1;
