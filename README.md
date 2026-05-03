@@ -1,5 +1,5 @@
 # Warehouse API
-A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, stock levels across multiple storage locations, and stock movement history. Built for internal use by warehouse staff and managers, using role-based access to control what each user can do.
+A RESTful API for managing warehouse inventory. Supports tracking items, stock levels across multiple storage locations, and stock movement history. Built for internal use by warehouse staff and managers, using role-based access to control what each user can do.
 
 ## Core Features
 - User registration and login with JWT auth
@@ -85,7 +85,7 @@ warehouse-api/
 ## Stretch Goals
 - [x] Low stock alerts - flag items that fall below a configurable threshold
 - [x] Audit log - append-only record of every stock movement (who did it, when, how much)
-- [ ] Soft deletes - instead of hard deleting items or locations, mark them inactive
+- [x] Soft deletes - instead of hard deleting items or locations, mark them inactive
 - [ ] Search and filtering on item listings (by name, SKU, low stock status)
 - [ ] Receiving endpoint - bulk-add stock from a shipment to a location
 - [x] Admin role - can manage users, reset passwords, assign roles
