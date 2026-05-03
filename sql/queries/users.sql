@@ -9,6 +9,12 @@ SET role = $2
 WHERE id = $1
 RETURNING *;
 
+-- name: ResetUserPassword :one
+UPDATE users
+SET hashed_password = $2, updated_at = now()
+WHERE id = $1
+RETURNING *;
+
 -- name: GetUserFromID :one
 SELECT * FROM users
 WHERE id = $1;

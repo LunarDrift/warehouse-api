@@ -50,4 +50,5 @@ type User struct {
 	HashedPassword string
 	Role           string
 	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }

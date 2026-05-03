@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (username, hashed_password)
 VALUES ($1, $2)
-RETURNING id, username, hashed_password, role, created_at
+RETURNING id, username, hashed_password, role, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -31,12 +31,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.HashedPassword,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUserFromID = `-- name: GetUserFromID :one
-SELECT id, username, hashed_password, role, created_at FROM users
+SELECT id, username, hashed_password, role, created_at, updated_at FROM users
 WHERE id = $1
 `
 
@@ -49,12 +50,13 @@ func (q *Queries) GetUserFromID(ctx context.Context, id uuid.UUID) (User, error)
 		&i.HashedPassword,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUserFromName = `-- name: GetUserFromName :one
-SELECT id, username, hashed_password, role, created_at FROM users
+SELECT id, username, hashed_password, role, created_at, updated_at FROM users
 WHERE username = $1
 `
 
@@ -67,6 +69,33 @@ func (q *Queries) GetUserFromName(ctx context.Context, username string) (User, e
 		&i.HashedPassword,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const resetUserPassword = `-- name: ResetUserPassword :one
+UPDATE users
+SET hashed_password = $2, updated_at = now()
+WHERE id = $1
+RETURNING id, username, hashed_password, role, created_at, updated_at
+`
+
+type ResetUserPasswordParams struct {
+	ID             uuid.UUID
+	HashedPassword string
+}
+
+func (q *Queries) ResetUserPassword(ctx context.Context, arg ResetUserPasswordParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, resetUserPassword, arg.ID, arg.HashedPassword)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.HashedPassword,
+		&i.Role,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -75,7 +104,7 @@ const updateUserRole = `-- name: UpdateUserRole :one
 UPDATE users
 SET role = $2
 WHERE id = $1
-RETURNING id, username, hashed_password, role, created_at
+RETURNING id, username, hashed_password, role, created_at, updated_at
 `
 
 type UpdateUserRoleParams struct {
@@ -92,6 +121,7 @@ func (q *Queries) UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) 
 		&i.HashedPassword,
 		&i.Role,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

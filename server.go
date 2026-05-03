@@ -32,6 +32,7 @@ func (s *Server) registerRoutes() {
 
 	s.mux.HandleFunc("POST /register", s.handleCreateUser)
 	s.mux.HandleFunc("POST /login", s.handleLoginUser)
+	s.mux.HandleFunc("PATCH /user/{id}", s.middlewareAuth(s.handleChangePassword))
 
 	s.mux.HandleFunc("GET /items", s.handleGetItems)
 	s.mux.HandleFunc("POST /items", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateItem)))

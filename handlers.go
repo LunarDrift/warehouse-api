@@ -73,6 +73,12 @@ func (s *Server) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	match, err := auth.CheckPasswordHash(params.Password, dbUser.HashedPassword)
+	if err != nil || !match {
+		respondWithError(w, http.StatusUnauthorized, "Incorrect username or password", err)
+		return
+	}
+
 	accessToken, err := auth.MakeJWT(dbUser.ID, s.jwtSecret, time.Hour)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Could not make JWT", err)
@@ -99,10 +105,58 @@ func (s *Server) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, loginResp)
 }
 
+func (s *Server) handleChangePassword(w http.ResponseWriter, r *http.Request) {
+	requestingUser, ok := r.Context().Value(userKey).(database.User)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", nil)
+		return
+	}
+
+	var params userParams
+	err := json.NewDecoder(r.Body).Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	userIDStr := r.PathValue("id")
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid item ID", err)
+		return
+	}
+
+	// allow if admin or changing own password
+	if requestingUser.Role != "admin" && requestingUser.ID != userID {
+		respondWithError(w, http.StatusForbidden, "Forbidden", nil)
+		return
+	}
+
+	hashedPassword, err := auth.HashPassword(params.Password)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not hash password", err)
+		return
+	}
+	user, err := s.dbQueries.ResetUserPassword(r.Context(), database.ResetUserPasswordParams{
+		ID:             userID,
+		HashedPassword: hashedPassword,
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not change password", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, User{
+		ID:        user.ID,
+		UserName:  user.Username,
+		Role:      user.Role,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	})
+}
+
 // #########################################################################################################################
 // ITEM HANDLERS
 // #########################################################################################################################
-// TODO: Implement low-stock threshold
 
 func (s *Server) handleCreateItem(w http.ResponseWriter, r *http.Request) {
 	var params itemParams
