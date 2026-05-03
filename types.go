@@ -21,7 +21,7 @@ type Location struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
-	IsActive    bool      `json:"is_active"`
+	IsActive    bool      `json:"is_active"` // for soft-deleting - set IsActive to false
 }
 
 type locationParams struct {

@@ -112,6 +112,43 @@ func (q *Queries) GetItemFromID(ctx context.Context, id uuid.UUID) (Item, error)
 	return i, err
 }
 
+const searchItems = `-- name: SearchItems :many
+SELECT id, sku, name, description, low_stock_threshold, created_at, is_active FROM items
+WHERE (name ILIKE '%' || $1::text || '%' OR sku ILIKE '%' || $1::text || '%')
+AND is_active = true
+`
+
+func (q *Queries) SearchItems(ctx context.Context, dollar_1 string) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, searchItems, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Item
+	for rows.Next() {
+		var i Item
+		if err := rows.Scan(
+			&i.ID,
+			&i.Sku,
+			&i.Name,
+			&i.Description,
+			&i.LowStockThreshold,
+			&i.CreatedAt,
+			&i.IsActive,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateItem = `-- name: UpdateItem :one
 UPDATE items
 SET sku = $2, name = $3, description = $4

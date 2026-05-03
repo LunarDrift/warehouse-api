@@ -40,6 +40,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("GET /users", s.middlewareAuth(s.middlewareRequireRole("admin", s.handleGetAllUsers)))
 
 	s.mux.HandleFunc("GET /items", s.middlewareAuth(s.handleGetItems))
+	s.mux.HandleFunc("GET /items/search", s.middlewareAuth(s.handleSearchItems))
 	s.mux.HandleFunc("POST /items", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateItem)))
 	s.mux.HandleFunc("GET /items/{id}", s.middlewareAuth(s.handleGetItemFromID))
 	s.mux.HandleFunc("DELETE /items/{id}", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleDeleteItem)))

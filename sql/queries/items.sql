@@ -22,3 +22,8 @@ RETURNING *;
 UPDATE items
 SET is_active = false
 WHERE id = $1;
+
+-- name: SearchItems :many
+SELECT * FROM items
+WHERE (name ILIKE '%' || $1::text || '%' OR sku ILIKE '%' || $1::text || '%')
+AND is_active = true;

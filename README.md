@@ -27,27 +27,28 @@ A RESTful API for managing warehouse inventory. Supports tracking items, stock l
 | POST   | `/revoke`               | Revoke a refresh token                                           |
 | PATCH   | `/user/{id}/password`               | Change user password (admin/own password only)                                          |
 | PATCH   | `/user/{id}/role`               | Change user role (admin only)                                          |
-| GET   | `/users`               | List all current users (admin only)                                          |
-|        |                        |                                                       |
+| GET    | `/users`               | List all current users (admin only)                 |
+|        |                      |                                                       |
 | GET    | `/items`               | List all items                                        |
+| GET    | `/items/search`        | Search for items by name or sku                                        |
 | POST   | `/items`               | Create item (manager only)                            |
 | GET    | `/items/{id}`          | Get single item                                       |
 | PATCH  | `/items/{id}`          | Update item (manager only)                            |
 | DELETE | `/items/{id}`          | Delete item (manager only)                            |
-|        |                        |                                                       |
+|        |                      |                                                       |
 | GET    | `/locations`           | List all locations                                    |
 | POST   | `/locations`           | Create location (manager only)                        |
 | GET    | `/locations/{id}`      | Get a single location                                 |
 | PATCH  | `/locations/{id}`      | Update location (manager only)                        |
 | DELETE | `/locations/{id}`      | Delete location (manager only)                        |
-|        |                        |                                                       |
+|        |                      |                                                       |
 | GET    | `/stock`               | View all current stock levels                         |
 | GET    | `/stock/alerts`        | View low-stock items - quantity < low stock threshold |
 | GET    | `/stock/item/{id}`     | Stock levels for one item across locations            |
 | GET    | `/stock/location/{id}` | All items from one location                           |
 | POST   | `/stock/move`          | Move quantity from one location to another            |
 | POST   | `/stock/receive`       | Add incoming stock to a location (manager only)       |
-|        |                        |                                                       |
+|        |                      |                                                       |
 | GET    | `/movements`           | Item movement history (manager only)                  |
 | GET    | `/movements/item/{id}` | Movement history for a single item                    |
 
@@ -86,6 +87,6 @@ warehouse-api/
 - [x] Low stock alerts - flag items that fall below a configurable threshold
 - [x] Audit log - append-only record of every stock movement (who did it, when, how much)
 - [x] Soft deletes - instead of hard deleting items or locations, mark them inactive
-- [ ] Search and filtering on item listings (by name, SKU, low stock status)
+- [x] Search and filtering on item listings (by name, SKU, low stock status)
 - [ ] Receiving endpoint - bulk-add stock from a shipment to a location
 - [x] Admin role - can manage users, reset passwords, assign roles

@@ -93,3 +93,14 @@ func (s *Server) handleUpdateItem(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, http.StatusOK, item)
 }
+
+func (s *Server) handleSearchItems(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+
+	items, err := s.dbQueries.SearchItems(r.Context(), query)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not search items", err)
+		return
+	}
+	respondWithJSON(w, http.StatusOK, items)
+}
