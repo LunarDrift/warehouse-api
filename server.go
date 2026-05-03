@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -34,7 +35,8 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("POST /login", s.handleLoginUser)
 	s.mux.HandleFunc("POST /refresh", s.handleRefreshAccessToken)
 	s.mux.HandleFunc("POST /revoke", s.handleRevokeAccessToken)
-	s.mux.HandleFunc("PATCH /user/{id}", s.middlewareAuth(s.handleChangePassword))
+	s.mux.HandleFunc("PATCH /user/{id}/password", s.middlewareAuth(s.handleChangePassword))
+	s.mux.HandleFunc("PATCH /user/{id}/role", s.middlewareAuth(s.middlewareRequireRole("admin", s.handleUpdateUserRole)))
 
 	s.mux.HandleFunc("GET /items", s.handleGetItems)
 	s.mux.HandleFunc("POST /items", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateItem)))
@@ -57,6 +59,11 @@ func (s *Server) registerRoutes() {
 
 	s.mux.HandleFunc("GET /movements", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleGetMovementHistory)))
 	s.mux.HandleFunc("GET /movements/item/{id}", s.handleGetItemMovementHistory)
+}
+
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	_, _ = fmt.Fprintln(w, `{"status": "ok"}`)
 }
 
 func respondWithJSON(w http.ResponseWriter, status int, payload any) {

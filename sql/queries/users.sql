@@ -5,7 +5,7 @@ RETURNING *;
 
 -- name: UpdateUserRole :one
 UPDATE users
-SET role = $2
+SET role = $2, updated_at = now()
 WHERE id = $1
 RETURNING *;
 
@@ -22,3 +22,7 @@ WHERE id = $1;
 -- name: GetUserFromName :one
 SELECT * FROM users
 WHERE username = $1;
+
+-- name: GetAllUsers :many
+SELECT * FROM users
+ORDER BY created_at DESC;
