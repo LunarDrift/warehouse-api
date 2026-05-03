@@ -7,7 +7,7 @@ A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, s
 - Create and manage locations (bays, shelves, etc)
 - Move stock between locations
 - View current stock levels per item and per location
-- Role-based access: `worker` and `manager` roles with different permissions
+- Role-based access: `worker`, `manager`, and `admin` roles with different permissions
 
 ## Tech Stack
 - **Go:** HTTP server (`net/http`)
@@ -23,8 +23,9 @@ A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, s
 | ------ | ---------------------- | ----------------------------------------------------- |
 | POST   | `/register`            | Create user account                                   |
 | POST   | `/login`               | Returns JWT                                           |
-| POST   | `/refresh`               | Returns new JWT                                           |
+| POST   | `/refresh`               | Returns fresh JWT                                           |
 | POST   | `/revoke`               | Revoke a refresh token                                           |
+| PATCH   | `/user/{id}`               | Change user password (admin/own password only)                                          |
 |        |                        |                                                       |
 | GET    | `/items`               | List all items                                        |
 | POST   | `/items`               | Create item (manager only)                            |
