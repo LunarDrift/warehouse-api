@@ -239,3 +239,23 @@ func (s *Server) handleRevokeAccessToken(w http.ResponseWriter, r *http.Request)
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (s *Server) handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := s.dbQueries.GetAllUsers(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch users", err)
+		return
+	}
+
+	result := make([]User, len(users))
+	for i, u := range users {
+		result[i] = User{
+			ID:        u.ID,
+			UserName:  u.Username,
+			Role:      u.Role,
+			CreatedAt: u.CreatedAt,
+			UpdatedAt: u.UpdatedAt,
+		}
+	}
+	respondWithJSON(w, http.StatusOK, result)
+}

@@ -37,6 +37,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("POST /revoke", s.handleRevokeAccessToken)
 	s.mux.HandleFunc("PATCH /user/{id}/password", s.middlewareAuth(s.handleChangePassword))
 	s.mux.HandleFunc("PATCH /user/{id}/role", s.middlewareAuth(s.middlewareRequireRole("admin", s.handleUpdateUserRole)))
+	s.mux.HandleFunc("GET /users", s.middlewareAuth(s.middlewareRequireRole("admin", s.handleGetAllUsers)))
 
 	s.mux.HandleFunc("GET /items", s.handleGetItems)
 	s.mux.HandleFunc("POST /items", s.middlewareAuth(s.middlewareRequireRole("manager", s.handleCreateItem)))
