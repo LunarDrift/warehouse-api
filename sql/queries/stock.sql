@@ -1,6 +1,8 @@
--- name: GetAllStock :many
-SELECT * FROM stock
-ORDER BY location_id;
+-- name: GetAllStockWithThreshold :many
+SELECT s.*, i.name, i.sku, i.low_stock_threshold
+FROM stock s
+JOIN items i ON s.item_id = i.id
+ORDER BY s.location_id;
 
 -- name: GetStockForItemAllLocations :many
 SELECT * FROM stock
@@ -26,3 +28,10 @@ INSERT INTO stock (
 ON CONFLICT (item_id, location_id)
 DO UPDATE SET quantity = stock.quantity + EXCLUDED.quantity
 RETURNING *;
+
+-- name: GetLowStockItems :many
+SELECT s.*, i.name, i.sku, i.low_stock_threshold
+FROM stock s
+JOIN items i ON s.item_id = i.id
+WHERE s.quantity < i.low_stock_threshold
+AND i.low_stock_threshold > 0;

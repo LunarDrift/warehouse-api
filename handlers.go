@@ -320,12 +320,25 @@ func (s *Server) handleReceiveStock(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleGetAllStock(w http.ResponseWriter, r *http.Request) {
-	items, err := s.dbQueries.GetAllStock(r.Context())
+	items, err := s.dbQueries.GetAllStockWithThreshold(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Could not fetch stock info", err)
 		return
 	}
-	respondWithJSON(w, http.StatusOK, items)
+	result := make([]stockResponse, len(items))
+	for i, item := range items {
+		result[i] = stockResponse{
+			ID:                item.ID,
+			ItemID:            item.ItemID,
+			LocationID:        item.LocationID,
+			Quantity:          item.Quantity,
+			Name:              item.Name,
+			Sku:               item.Sku,
+			LowStockThreshold: item.LowStockThreshold,
+			LowStockWarning:   item.Quantity < item.LowStockThreshold,
+		}
+	}
+	respondWithJSON(w, http.StatusOK, result)
 }
 
 func (s *Server) handleGetItemStock(w http.ResponseWriter, r *http.Request) {
@@ -356,6 +369,27 @@ func (s *Server) handleGetLocationStock(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	respondWithJSON(w, http.StatusOK, stock)
+}
+
+func (s *Server) handleGetLowStockItems(w http.ResponseWriter, r *http.Request) {
+	lowStockItems, err := s.dbQueries.GetLowStockItems(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not fetch items", err)
+		return
+	}
+	result := make([]stockResponse, len(lowStockItems))
+	for i, itemRow := range lowStockItems {
+		result[i] = stockResponse{
+			ID:                itemRow.ID,
+			ItemID:            itemRow.ItemID,
+			LocationID:        itemRow.LocationID,
+			Quantity:          itemRow.Quantity,
+			Name:              itemRow.Name,
+			Sku:               itemRow.Sku,
+			LowStockThreshold: itemRow.LowStockThreshold,
+		}
+	}
+	respondWithJSON(w, http.StatusOK, result)
 }
 
 // #########################################################################################################################

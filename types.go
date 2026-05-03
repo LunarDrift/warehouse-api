@@ -50,3 +50,14 @@ type moveStockRequest struct {
 	ToLocationID   uuid.UUID `json:"to_location"`
 	Quantity       int32     `json:"quantity"`
 }
+
+type stockResponse struct {
+	ID                uuid.UUID `json:"id"`
+	ItemID            uuid.UUID `json:"item_id"`
+	LocationID        uuid.UUID `json:"location_id"`
+	Quantity          int32     `json:"quantity"`
+	Name              string    `json:"item_name"`
+	Sku               string    `json:"sku"`
+	LowStockThreshold int32     `json:"low_stock_threshold"`
+	LowStockWarning   bool      `json:"low_stock_warning"`
+}

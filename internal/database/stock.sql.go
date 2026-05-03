@@ -11,25 +11,89 @@ import (
 	"github.com/google/uuid"
 )
 
-const getAllStock = `-- name: GetAllStock :many
-SELECT id, item_id, location_id, quantity FROM stock
-ORDER BY location_id
+const getAllStockWithThreshold = `-- name: GetAllStockWithThreshold :many
+SELECT s.id, s.item_id, s.location_id, s.quantity, i.name, i.sku, i.low_stock_threshold
+FROM stock s
+JOIN items i ON s.item_id = i.id
+ORDER BY s.location_id
 `
 
-func (q *Queries) GetAllStock(ctx context.Context) ([]Stock, error) {
-	rows, err := q.db.QueryContext(ctx, getAllStock)
+type GetAllStockWithThresholdRow struct {
+	ID                uuid.UUID
+	ItemID            uuid.UUID
+	LocationID        uuid.UUID
+	Quantity          int32
+	Name              string
+	Sku               string
+	LowStockThreshold int32
+}
+
+func (q *Queries) GetAllStockWithThreshold(ctx context.Context) ([]GetAllStockWithThresholdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllStockWithThreshold)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Stock
+	var items []GetAllStockWithThresholdRow
 	for rows.Next() {
-		var i Stock
+		var i GetAllStockWithThresholdRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ItemID,
 			&i.LocationID,
 			&i.Quantity,
+			&i.Name,
+			&i.Sku,
+			&i.LowStockThreshold,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLowStockItems = `-- name: GetLowStockItems :many
+SELECT s.id, s.item_id, s.location_id, s.quantity, i.name, i.sku, i.low_stock_threshold
+FROM stock s
+JOIN items i ON s.item_id = i.id
+WHERE s.quantity < i.low_stock_threshold
+AND i.low_stock_threshold > 0
+`
+
+type GetLowStockItemsRow struct {
+	ID                uuid.UUID
+	ItemID            uuid.UUID
+	LocationID        uuid.UUID
+	Quantity          int32
+	Name              string
+	Sku               string
+	LowStockThreshold int32
+}
+
+func (q *Queries) GetLowStockItems(ctx context.Context) ([]GetLowStockItemsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getLowStockItems)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetLowStockItemsRow
+	for rows.Next() {
+		var i GetLowStockItemsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ItemID,
+			&i.LocationID,
+			&i.Quantity,
+			&i.Name,
+			&i.Sku,
+			&i.LowStockThreshold,
 		); err != nil {
 			return nil, err
 		}

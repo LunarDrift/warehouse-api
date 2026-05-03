@@ -18,31 +18,34 @@ A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, s
 
 ## API Endpoints
 
-| METHOD | ENDPOINT               | DESCRIPTION                                     |
-| ------ | ---------------------- | ----------------------------------------------- |
-| POST   | `/register`            | Create user account                             |
-| POST   | `/login`               | Returns JWT                                     |
-|        |                      |                                                 |
-| GET    | `/items`               | List all items                                  |
-| POST   | `/items`               | Create item (manager only)                      |
-| GET    | `/items/{id}`          | Get single item                                 |
-| PATCH  | `/items/{id}`          | Update item (manager only)                      |
-| DELETE | `/items/{id}`          | Delete item (manager only)                      |
-|        |                      |                                                 |
-| GET    | `/locations`           | List all locations                              |
-| POST   | `/locations`           | Create location (manager only)                  |
-| GET    | `/locations/{id}`      | Get a single location                           |
-| PATCH  | `/locations/{id}`      | Update location (manager only)                  |
-| DELETE | `/locations/{id}`      | Delete location (manager only)                  |
-|        |                      |                                                 |
-| GET    | `/stock`               | View all current stock levels                   |
-| GET    | `/stock/item/{id}`     | Stock levels for one item across locations      |
-| GET    | `/stock/location/{id}` | All items from one location                     |
-| POST   | `/stock/move`          | Move quantity from one location to another      |
-| POST   | `/stock/receive`       | Add incoming stock to a location (manager only) |
-|        |                      |                                                 |
-| GET    | `/movements`           | Item movement history (manager only)            |
-| GET    | `/movements/item/{id}` | Movement history for a single item              |
+
+| METHOD | ENDPOINT               | DESCRIPTION                                           |
+| ------ | ---------------------- | ----------------------------------------------------- |
+| POST   | `/register`            | Create user account                                   |
+| POST   | `/login`               | Returns JWT                                           |
+|        |                        |                                                       |
+| GET    | `/items`               | List all items                                        |
+| POST   | `/items`               | Create item (manager only)                            |
+| GET    | `/items/{id}`          | Get single item                                       |
+| PATCH  | `/items/{id}`          | Update item (manager only)                            |
+| DELETE | `/items/{id}`          | Delete item (manager only)                            |
+|        |                        |                                                       |
+| GET    | `/locations`           | List all locations                                    |
+| POST   | `/locations`           | Create location (manager only)                        |
+| GET    | `/locations/{id}`      | Get a single location                                 |
+| PATCH  | `/locations/{id}`      | Update location (manager only)                        |
+| DELETE | `/locations/{id}`      | Delete location (manager only)                        |
+|        |                        |                                                       |
+| GET    | `/stock`               | View all current stock levels                         |
+| GET    | `/stock/alerts`        | View low-stock items - quantity < low stock threshold |
+| GET    | `/stock/item/{id}`     | Stock levels for one item across locations            |
+| GET    | `/stock/location/{id}` | All items from one location                           |
+| POST   | `/stock/move`          | Move quantity from one location to another            |
+| POST   | `/stock/receive`       | Add incoming stock to a location (manager only)       |
+|        |                        |                                                       |
+| GET    | `/movements`           | Item movement history (manager only)                  |
+| GET    | `/movements/item/{id}` | Movement history for a single item                    |
+
 
 ## Project Structure
 ```
