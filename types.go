@@ -33,9 +33,10 @@ type userParams struct {
 }
 
 type itemParams struct {
-	Sku         string `json:"sku"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Sku               string `json:"sku"`
+	Name              string `json:"name"`
+	Description       string `json:"description"`
+	LowStockThreshold int32  `json:"low_stock_threshold"`
 }
 
 type receiveStockParams struct {

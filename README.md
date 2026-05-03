@@ -66,8 +66,8 @@ warehouse-api/
 ```
 
 ## Stretch Goals
-- [ ] Low stock alerts - flag items that fall below a configurable threshold
-- [ ] Audit log - append-only record of every stock movement (who did it, when, how much)
+- [x] Low stock alerts - flag items that fall below a configurable threshold
+- [x] Audit log - append-only record of every stock movement (who did it, when, how much)
 - [ ] Soft deletes - instead of hard deleting items or locations, mark them inactive
 - [ ] Search and filtering on item listings (by name, SKU, low stock status)
 - [ ] Receiving endpoint - bulk-add stock from a shipment to a location

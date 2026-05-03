@@ -111,9 +111,10 @@ func (s *Server) handleCreateItem(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
 	}
 	item, err := s.dbQueries.CreateItem(r.Context(), database.CreateItemParams{
-		Sku:         params.Sku,
-		Name:        params.Name,
-		Description: params.Description,
+		Sku:               params.Sku,
+		Name:              params.Name,
+		Description:       params.Description,
+		LowStockThreshold: params.LowStockThreshold,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Could not create item", err)
@@ -377,9 +378,18 @@ func (s *Server) handleGetLowStockItems(w http.ResponseWriter, r *http.Request) 
 		respondWithError(w, http.StatusInternalServerError, "Could not fetch items", err)
 		return
 	}
-	result := make([]stockResponse, len(lowStockItems))
+	type response struct {
+		ID                uuid.UUID `json:"id"`
+		ItemID            uuid.UUID `json:"item_id"`
+		LocationID        uuid.UUID `json:"location_id"`
+		Quantity          int32     `json:"quantity"`
+		Name              string    `json:"item_name"`
+		Sku               string    `json:"sku"`
+		LowStockThreshold int32     `json:"low_stock_threshold"`
+	}
+	result := make([]response, len(lowStockItems))
 	for i, itemRow := range lowStockItems {
-		result[i] = stockResponse{
+		result[i] = response{
 			ID:                itemRow.ID,
 			ItemID:            itemRow.ItemID,
 			LocationID:        itemRow.LocationID,

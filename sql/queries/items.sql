@@ -1,6 +1,6 @@
 -- name: CreateItem :one
-INSERT INTO items (sku, name, description)
-VALUES ($1, $2, $3)
+INSERT INTO items (sku, name, description, low_stock_threshold)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetAllItems :many
