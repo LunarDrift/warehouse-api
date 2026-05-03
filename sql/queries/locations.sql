@@ -5,6 +5,7 @@ RETURNING *;
 
 -- name: GetAllLocations :many
 SELECT * FROM locations
+WHERE is_active = true
 ORDER BY created_at;
 
 -- name: GetLocationFromID :one
@@ -18,5 +19,6 @@ WHERE id = $1
 RETURNING *;
 
 -- name: DeleteLocation :exec
-DELETE FROM locations
+UPDATE locations
+SET is_active = false
 WHERE id = $1;

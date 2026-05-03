@@ -15,7 +15,7 @@ import (
 const createLocation = `-- name: CreateLocation :one
 INSERT INTO locations (name, description)
 VALUES ($1, $2)
-RETURNING id, name, description, created_at
+RETURNING id, name, description, created_at, is_active
 `
 
 type CreateLocationParams struct {
@@ -31,12 +31,14 @@ func (q *Queries) CreateLocation(ctx context.Context, arg CreateLocationParams) 
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.IsActive,
 	)
 	return i, err
 }
 
 const deleteLocation = `-- name: DeleteLocation :exec
-DELETE FROM locations
+UPDATE locations
+SET is_active = false
 WHERE id = $1
 `
 
@@ -46,7 +48,8 @@ func (q *Queries) DeleteLocation(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAllLocations = `-- name: GetAllLocations :many
-SELECT id, name, description, created_at FROM locations
+SELECT id, name, description, created_at, is_active FROM locations
+WHERE is_active = true
 ORDER BY created_at
 `
 
@@ -64,6 +67,7 @@ func (q *Queries) GetAllLocations(ctx context.Context) ([]Location, error) {
 			&i.Name,
 			&i.Description,
 			&i.CreatedAt,
+			&i.IsActive,
 		); err != nil {
 			return nil, err
 		}
@@ -79,7 +83,7 @@ func (q *Queries) GetAllLocations(ctx context.Context) ([]Location, error) {
 }
 
 const getLocationFromID = `-- name: GetLocationFromID :one
-SELECT id, name, description, created_at FROM locations
+SELECT id, name, description, created_at, is_active FROM locations
 WHERE id = $1
 `
 
@@ -91,6 +95,7 @@ func (q *Queries) GetLocationFromID(ctx context.Context, id uuid.UUID) (Location
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.IsActive,
 	)
 	return i, err
 }
@@ -99,7 +104,7 @@ const updateLocation = `-- name: UpdateLocation :one
 UPDATE locations
 SET name = $2, description = $3
 WHERE id = $1
-RETURNING id, name, description, created_at
+RETURNING id, name, description, created_at, is_active
 `
 
 type UpdateLocationParams struct {
@@ -116,6 +121,7 @@ func (q *Queries) UpdateLocation(ctx context.Context, arg UpdateLocationParams) 
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
+		&i.IsActive,
 	)
 	return i, err
 }

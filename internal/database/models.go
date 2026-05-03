@@ -26,6 +26,7 @@ type Location struct {
 	Name        string
 	Description sql.NullString
 	CreatedAt   time.Time
+	IsActive    bool
 }
 
 type RefreshToken struct {

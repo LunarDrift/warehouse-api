@@ -14,6 +14,7 @@ func dbLocationToLocation(loc database.Location) Location {
 		Name:        loc.Name,
 		Description: loc.Description.String,
 		CreatedAt:   loc.CreatedAt,
+		IsActive:    loc.IsActive,
 	}
 }
 

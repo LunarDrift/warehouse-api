@@ -21,6 +21,7 @@ type Location struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
+	IsActive    bool      `json:"is_active"`
 }
 
 type locationParams struct {
