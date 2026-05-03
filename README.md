@@ -46,6 +46,18 @@ A (WIP) RESTful API for managing warehouse inventory. Supports tracking items, s
 | GET    | `/movements`           | Item movement history (manager only)                  |
 | GET    | `/movements/item/{id}` | Movement history for a single item                    |
 
+## Real World Workflow
+1. **Setup (manager)**
+  A manager logs in and creates the items and locations first. Items are things like "Heavy Duty Work Gloves" with SKU `GLOVE-HD-LG`. Locations are physical spots in the warehouse, like "Aisle 3 Bay 1" or "Back Stockroom Shelf 2". Neither has any quantity yet. This is just building the catalog and map of the warehouse.
+
+2. **Receiving a shipment (manager)**
+  A truck arrives with 50 pairs of gloves. The managers hits `POST /stock/receive` with the item ID, location ID, and quantity of 50. Now the warehouse actually has stock. This is the only way stock enters the system.
+
+3. **Day-to-day operations (worker)**
+  A worker needs 10 pairs of gloves from Aisle 3 to fulfill an order. They move them to the "Dispatch Bay" location with `POST /stock/move`. The system decrements Aisle 3 and increments Dispatch Bay. Nobody creates or destroys stock - it just moves around between locations.
+
+4. **Checking stock (anyone)**
+  Anyone can hit `GET /stock/item/{id}` to see where all the gloves are and how many, or `GET /stock/location/{id}` to see everything currently sitting in Aisle 3.
 
 ## Project Structure
 ```
