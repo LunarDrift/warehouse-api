@@ -88,4 +88,4 @@ warehouse-api/
 - [ ] Soft deletes - instead of hard deleting items or locations, mark them inactive
 - [ ] Search and filtering on item listings (by name, SKU, low stock status)
 - [ ] Receiving endpoint - bulk-add stock from a shipment to a location
-- [ ] Admin role - can manage users, reset passwords, assign roles
+- [x] Admin role - can manage users, reset passwords, assign roles
