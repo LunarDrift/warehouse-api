@@ -14,7 +14,40 @@ A RESTful API for managing warehouse inventory. Supports tracking items, stock l
 - **PostgreSQL:** persistent storage
 - **goose:** database migrations
 - **sqlc:** type-safe SQL query generation
-- **Docker:** containerize the app and database together (not yet implemented)
+- **Docker:** containerize the app and database together
+
+## Setup
+1. Clone the repo
+```bash
+git clone https://github.com/LunarDrift/warehouse-api
+cd warehouse-api
+```
+
+2. Create a `.env.docker` file in the project root with the following variables:
+```
+DB_URL=postgres://postgres:postgres@db:5432/warehouse?sslmode=disable
+JWT_SECRET=your-secret-here
+```
+
+3. Start the app
+```bash
+docker compose up --build
+```
+
+The server will be available at `http://localhost:8080`. Migrations run automatically on startup.
+*Postgres may take a few seconds to initialize on the first run, and the app may try to connect before it's ready causing a connection error. Just try `docker compose up` again - Postgres should already be running from the first attempt and the app should connect fine.*
+
+Stopping the app
+```bash
+docker compose down
+```
+
+To remove the database volume as well (this deletes all data)
+```bash
+docker compose down -v
+```
+
+
 
 ## API Endpoints
 
@@ -52,6 +85,22 @@ A RESTful API for managing warehouse inventory. Supports tracking items, stock l
 | GET    | `/movements`           | Item movement history (manager only)                  |
 | GET    | `/movements/item/{id}` | Movement history for a single item                    |
 
+```bash
+# Register
+curl -X POST http://localhost:8080/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "john", "password": "password123"}'
+
+# Login - copy the token from the response
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "john", "password": "password123"}'
+
+# Use the token
+curl http://localhost:8080/items \
+  -H "Authorization: Bearer <your-token>"
+```
+
 ## Real World Workflow
 1. **Setup (manager):**
     A manager logs in and creates the items and locations first. Items are things like "Heavy Duty Work Gloves" with SKU `GLOVE-HD-LG`. Locations are physical spots in the warehouse, like "Aisle 3 Bay 1" or "Back Stockroom Shelf 2". Neither has any quantity yet. This is just building the catalog and map of the warehouse.
@@ -88,5 +137,5 @@ warehouse-api/
 - [x] Audit log - append-only record of every stock movement (who did it, when, how much)
 - [x] Soft deletes - instead of hard deleting items or locations, mark them inactive
 - [x] Search and filtering on item listings (by name, SKU, low stock status)
-- [ ] Receiving endpoint - bulk-add stock from a shipment to a location
+- [x] Receiving endpoint - bulk-add stock from a shipment to a location
 - [x] Admin role - can manage users, reset passwords, assign roles
