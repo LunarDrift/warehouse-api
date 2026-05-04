@@ -5,9 +5,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/LunarDrift/warehouse-api/internal/database"
 	"github.com/joho/godotenv"
+	"github.com/pressly/goose"
 
 	_ "github.com/lib/pq"
 )
@@ -15,17 +17,31 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Couldn't find .env file: ", err)
+		log.Println("No .env file found, using environment variables")
 	}
 
 	connectionString := os.Getenv("DB_URL")
 	jwtSecret := os.Getenv("JWT_SECRET")
 
-	sqlDB, err := sql.Open("postgres", connectionString)
+	var sqlDB *sql.DB
+	for i := range 5 {
+		sqlDB, err = sql.Open("postgres", connectionString)
+		if err == nil {
+			if err = sqlDB.Ping(); err == nil {
+				break
+			}
+		}
+		log.Printf("DB not ready, retrying in 2 seconds... (attempt %d/5)", i+1)
+		time.Sleep(2 * time.Second)
+	}
 	if err != nil {
-		log.Fatal("Could not connect to database: ", err)
+		log.Fatal("Could not connect to database after retries: ", err)
 	}
 	defer sqlDB.Close()
+
+	if err := goose.Up(sqlDB, "sql/schema"); err != nil {
+		log.Fatal(err)
+	}
 
 	queries := database.New(sqlDB)
 
