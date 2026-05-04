@@ -129,6 +129,8 @@ warehouse-api/
 ├── sql/
 │   ├── queries/          # SQL queries
 │   └── schema/           # goose migrations
+├── Dockerfile
+├── docker-compose.yml
 └── sqlc.yaml
 ```
 
