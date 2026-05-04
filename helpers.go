@@ -61,3 +61,28 @@ func (s *Server) processMoveStock(ctx context.Context, params moveStockRequest, 
 
 	return movement, tx.Commit()
 }
+
+func (s *Server) processReceiveBulkStock(ctx context.Context, params receiveStockParams) ([]database.Stock, error) {
+	tx, err := s.sqlDB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	qtx := s.dbQueries.WithTx(tx)
+
+	var results []database.Stock
+	for _, item := range params.Items {
+		stock, err := qtx.ReceiveStock(ctx, database.ReceiveStockParams{
+			ItemID:     item.ItemID,
+			LocationID: item.LocationID,
+			Quantity:   item.Quantity,
+		})
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, stock)
+	}
+
+	return results, tx.Commit()
+}

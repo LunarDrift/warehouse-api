@@ -30,7 +30,7 @@ A RESTful API for managing warehouse inventory. Supports tracking items, stock l
 | GET    | `/users`               | List all current users (admin only)                 |
 |        |                      |                                                       |
 | GET    | `/items`               | List all items                                        |
-| GET    | `/items/search`        | Search for items by name or sku                                        |
+| GET    | `/items/search`        | Search for items by name or sku (ex. `GET /items/search?q=glove`)                               |
 | POST   | `/items`               | Create item (manager only)                            |
 | GET    | `/items/{id}`          | Get single item                                       |
 | PATCH  | `/items/{id}`          | Update item (manager only)                            |

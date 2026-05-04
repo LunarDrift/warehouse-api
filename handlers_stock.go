@@ -15,16 +15,13 @@ func (s *Server) handleReceiveStock(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request body", err)
 		return
 	}
-	stockInfo, err := s.dbQueries.ReceiveStock(r.Context(), database.ReceiveStockParams{
-		ItemID:     params.ItemID,
-		LocationID: params.LocationID,
-		Quantity:   params.Quantity,
-	})
+
+	results, err := s.processReceiveBulkStock(r.Context(), params)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Could not receive item", err)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Could not receive stock", err)
 	}
-	respondWithJSON(w, http.StatusCreated, stockInfo)
+
+	respondWithJSON(w, http.StatusCreated, results)
 }
 
 func (s *Server) handleGetAllStock(w http.ResponseWriter, r *http.Request) {
