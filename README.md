@@ -16,7 +16,10 @@ A RESTful API for managing warehouse inventory. Supports tracking items, stock l
 - **sqlc:** type-safe SQL query generation
 - **Docker:** containerize the app and database together
 
-## Setup
+## Motivation
+After countless hours spent looking everywhere for material, and being told that "the system shows it was delivered" I had enough. I made this with the intention of easily being able to keep track of what material is where while on the job site.
+
+## Quick Start / Setup
 1. Clone the repo
 ```bash
 git clone https://github.com/LunarDrift/warehouse-api
@@ -48,9 +51,9 @@ docker compose down -v
 ```
 
 
+## Usage
 
-## API Endpoints
-
+### API Endpoints
 
 | METHOD | ENDPOINT               | DESCRIPTION                                           |
 | ------ | ---------------------- | ----------------------------------------------------- |
@@ -141,3 +144,6 @@ warehouse-api/
 - [x] Search and filtering on item listings (by name, SKU, low stock status)
 - [x] Receiving endpoint - bulk-add stock from a shipment to a location
 - [x] Admin role - can manage users, reset passwords, assign roles
+
+## Contributing
+If you'd like to contribute, please fork the repo and open a pull request to the `main` branch
