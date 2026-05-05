@@ -6,8 +6,14 @@ import (
 	"github.com/google/uuid"
 )
 
-// main.User so I'm not sending hashed password in payload
+type Role string
 
+const (
+	RoleManager Role = "manager"
+	RoleAdmin   Role = "admin"
+)
+
+// User so I'm not sending hashed password in payload
 type User struct {
 	ID        uuid.UUID `json:"id"`
 	UserName  string    `json:"username"`

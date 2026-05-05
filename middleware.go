@@ -37,7 +37,7 @@ func (s *Server) middlewareAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (s *Server) middlewareRequireRole(role string, next http.HandlerFunc) http.HandlerFunc {
+func (s *Server) middlewareRequireRole(role Role, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// fetch user from context
 		user, ok := r.Context().Value(userKey).(database.User)
@@ -45,8 +45,8 @@ func (s *Server) middlewareRequireRole(role string, next http.HandlerFunc) http.
 			respondWithError(w, http.StatusUnauthorized, "Unauthorized", nil)
 			return
 		}
-		if user.Role != role {
-			respondWithError(w, http.StatusUnauthorized, "Forbidden", nil)
+		if Role(user.Role) != role {
+			respondWithError(w, http.StatusForbidden, "Forbidden", nil)
 			return
 		}
 		next(w, r)
